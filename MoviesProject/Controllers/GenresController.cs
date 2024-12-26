@@ -16,16 +16,21 @@ namespace MoviesProject.Controllers
     {
         // Service injections:
         private readonly IGenreService _genreService;
+        private readonly IService<Movie, MovieModel> _movieService;
+
         /* Can be uncommented and used for many to many relationships. {Entity} may be replaced with the related entiy name in the controller and views. */
         //private readonly IService<{Entity}, {Entity}Model> _{Entity}Service;
 
         public GenresController(
               IGenreService genreService
+            , IService<Movie, MovieModel> movieService
+
 
 
         )
         {
             _genreService = genreService;
+            _movieService = movieService;
 
             /* Can be uncommented and used for many to many relationships. {Entity} may be replaced with the related entiy name in the controller and views. */
             //_{Entity}Service = {Entity}Service;
@@ -114,8 +119,18 @@ namespace MoviesProject.Controllers
         // GET: Genres/Delete/5
         public IActionResult Delete(int id)
         {
-            // Get item to delete service logic:
             var item = _genreService.Query().SingleOrDefault(q => q.Record.Id == id);
+
+            // Initialize ViewBag.HasDependencies with a default value
+            ViewBag.HasDependencies = false;
+
+            var hasMovies = _movieService.Query()
+                .Any(m => m.Record.MovieGenres.Any(mg => mg.GenreId == id));
+            if (hasMovies)
+            {
+                ViewBag.HasDependencies = true;
+                ViewBag.DependencyMessage = "This genre is associated with movies. Deleting will remove all movie relationships.";
+            }
             return View(item);
         }
 

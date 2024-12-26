@@ -18,6 +18,7 @@ namespace MoviesProject.Controllers
         private readonly IService<Movie, MovieModel> _movieService;
         private readonly IService<Director, DirectorModel> _directorService;
         private readonly IGenreService _genreService;
+        private readonly HttpServiceBase _httpService;
 
         /* Can be uncommented and used for many to many relationships. {Entity} may be replaced with the related entiy name in the controller and views. */
         //private readonly IService<{Entity}, {Entity}Model> _{Entity}Service;
@@ -25,11 +26,13 @@ namespace MoviesProject.Controllers
         public MoviesController(
             IService<Movie, MovieModel> movieService,
             IService<Director, DirectorModel> directorService,
-            IGenreService genreService)
+            IGenreService genreService,
+            HttpServiceBase httpService)
         {
             _movieService = movieService;
             _directorService = directorService;
             _genreService = genreService;
+            _httpService = httpService;
         }
 
         protected void SetViewData()
@@ -43,8 +46,24 @@ namespace MoviesProject.Controllers
         [AllowAnonymous]
         public IActionResult Index()
         {
-            // Get collection service logic:
             var list = _movieService.Query().ToList();
+
+            // Get user's favorites if logged in
+            List<int> favoriteMovieIds = new List<int>();
+            if (User.Identity.IsAuthenticated)
+            {
+                const string SESSIONKEY = "Favorites";
+                var favorites = _httpService.GetSession<List<FavoritesModel>>(SESSIONKEY);
+                if (favorites != null)
+                {
+                    favoriteMovieIds = favorites
+                        .Where(f => f.UserId == Convert.ToInt32(User.Claims.SingleOrDefault(c => c.Type == "Id").Value))
+                        .Select(f => f.MovieId)
+                        .ToList();
+                }
+            }
+            ViewBag.FavoriteMovieIds = favoriteMovieIds;
+
             return View(list);
         }
 
@@ -131,8 +150,17 @@ namespace MoviesProject.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteConfirmed(int id)
         {
-            // Delete item service logic:
             var result = _movieService.Delete(id);
+            if (result.IsSuccessful)
+            {
+                const string SESSIONKEY = "Favorites";
+                var allFavorites = _httpService.GetSession<List<FavoritesModel>>(SESSIONKEY);
+                if (allFavorites != null)
+                {
+                    allFavorites.RemoveAll(f => f.MovieId == id);
+                    _httpService.SetSession(SESSIONKEY, allFavorites);
+                }
+            }
             TempData["Message"] = result.Message;
             return RedirectToAction(nameof(Index));
         }

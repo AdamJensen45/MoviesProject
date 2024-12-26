@@ -56,6 +56,27 @@
 				<span asp-validation-for="Record.DirectorId" class="text-danger"></span>
 			</div>
         </div>
+        <div class="row mb-3">
+            <label asp-for="GenreIds" class="col-2 col-form-label fw-bold"></label>
+            <div class="col-10">
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 10px;">
+                    @foreach (var item in ViewBag.GenreIds)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="GenreIds"
+                                   value="@item.Value"
+                            @(Model?.GenreIds != null && Model.GenreIds.Contains(int.Parse(item.Value)) ? "checked" : "") />
+                            <label class="form-check-label">
+                                @item.Text
+                            </label>
+                        </div>
+                    }
+                </div>
+                <span asp-validation-for="GenreIds" class="text-danger"></span>
+            </div>
+        </div>
 
 @* Can be uncommented and used for many to many relationships. {Entity} may be replaced with the related entiy name in the controller and views. *@
         @*

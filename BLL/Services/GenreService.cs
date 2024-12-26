@@ -55,12 +55,10 @@ namespace BLL.Services
         public ServiceBase Delete(int id)
         {
             var entity = _db.Genres.Include(g => g.MovieGenres)
-                                 .SingleOrDefault(g => g.Id == id);
+                                  .SingleOrDefault(g => g.Id == id);
             if (entity is null)
                 return Error("Genre not found!");
 
-            if (entity.MovieGenres.Any())
-                return Error("Genre has related movies!");
 
             _db.Genres.Remove(entity);
             _db.SaveChanges();

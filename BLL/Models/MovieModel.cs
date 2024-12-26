@@ -23,8 +23,9 @@ namespace BLL.Models
         [DisplayName("Genres")]
         public List<int> GenreIds
         {
-            get => Record.MovieGenres?.Select(mg => mg.GenreId).ToList();
-            set => Record.MovieGenres = value.Select(v => new MovieGenre() { GenreId = v }).ToList();
+            get => Record.MovieGenres?.Select(mg => mg.GenreId).ToList() ?? new List<int>();
+            set => Record.MovieGenres = value?.Select(v => new MovieGenre() { GenreId = v }).ToList() ?? new List<MovieGenre>();
         }
+        public object MovieGenres { get; set; }
     }
 }

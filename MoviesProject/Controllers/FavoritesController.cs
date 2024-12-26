@@ -15,6 +15,16 @@ namespace MoviesProject.Controllers
         private readonly HttpServiceBase _httpService;
         private readonly IService<Movie, MovieModel> _movieService;
 
+        public void RemoveFromAllFavorites(int movieId)
+        {
+            var allFavorites = _httpService.GetSession<List<FavoritesModel>>(SESSIONKEY);
+            if (allFavorites != null)
+            {
+                allFavorites.RemoveAll(f => f.MovieId == movieId);
+                _httpService.SetSession(SESSIONKEY, allFavorites);
+            }
+        }
+
         public FavoritesController(HttpServiceBase httpService, IService<Movie, MovieModel> movieService)
         {
             _httpService = httpService;
@@ -34,12 +44,18 @@ namespace MoviesProject.Controllers
             return View("List", GetSession(GetUserId()));
         }
 
-        public IActionResult Remove(int movieId)
+        public IActionResult Remove(int movieId, string returnUrl = null)
         {
             var favorites = GetSession(GetUserId());
             var favoritesItem = favorites.FirstOrDefault(c => c.MovieId == movieId);
             favorites.Remove(favoritesItem);
             _httpService.SetSession(SESSIONKEY, favorites);
+
+            if (!string.IsNullOrEmpty(returnUrl) && returnUrl.Contains("Movies"))
+            {
+                return RedirectToAction("Index", "Movies");
+            }
+
             return RedirectToAction(nameof(Get));
         }
 

@@ -58,8 +58,7 @@ namespace BLL.Services
             if (entity is null)
                 return Error("Director not found!");
 
-            if (entity.Movies.Any())
-                return Error("Director has related movies!");
+            
 
             _db.Directors.Remove(entity);
             _db.SaveChanges();

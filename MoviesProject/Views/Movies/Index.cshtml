@@ -74,15 +74,24 @@
                             <td class="text-end w-25">
                                 @if (User.Identity.IsAuthenticated)
                                 {
-                                    <a asp-action="Add" asp-controller="Favorites" asp-route-movieId="@item.Record.Id">Add to Favorites</a>
+                                    if (ViewBag.FavoriteMovieIds.Contains(item.Record.Id))
+                                    {
+                                        <a asp-action="Remove" asp-controller="Favorites"
+                                           asp-route-movieId="@item.Record.Id"
+                                           asp-route-returnUrl="Movies"
+                                           class="btn btn-outline-danger btn-sm">Remove from Favorites</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Add" asp-controller="Favorites" asp-route-movieId="@item.Record.Id"
+                                           class="btn btn-outline-primary btn-sm">Add to Favorites</a>
+                                    }
                                     @:&nbsp;|&nbsp;
                                     <a asp-action="Details" asp-route-id="@item.Record.Id">Details</a>
-
-                                    @:&nbsp;|&nbsp;
-                                    if (User.IsInRole("Admin"))
+                                    @if (User.IsInRole("Admin"))
                                     {
+                                        @:&nbsp;|&nbsp;
                                         <a asp-action="Edit" asp-route-id="@item.Record.Id">Edit</a>
-
                                         @:&nbsp;|&nbsp;
                                         <a asp-action="Delete" asp-route-id="@item.Record.Id">Delete</a>
                                     }
@@ -93,5 +102,6 @@
                 </tbody>
             </table>
         </div>
+
     </form>
 }
