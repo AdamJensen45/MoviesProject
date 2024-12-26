@@ -1,0 +1,24 @@
+{
+  "version": "3.0",
+  "defaultProvider": "jsdelivr",
+  "libraries": [
+    {
+      "library": "jquery-datetimepicker@2.5.20",
+      "destination": "wwwroot/lib/jquery-datetimepicker/"
+    },
+    {
+      "library": "jquery-datetimepicker@2.5.21",
+      "destination": "wwwroot/jquery-datetimepicker/",
+      "files": [
+        "jquery.datetimepicker.min.css",
+        "build/jquery.datetimepicker.full.min.js",
+        "build/jquery.datetimepicker.min.css"
+      ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "jquery-datetimepicker@2.5.20",
+      "destination": "wwwroot/lib/jquery-datetimepicker/"
+    }
+  ]
+}
